@@ -11,10 +11,16 @@ git clone https://github.com/Daniel-Nashnaz/barboris.git
 cd barboris
 ```
 
-```bash
+- Install dependencies
+```
 npm install
 ```
-
-```bash
+- Build and run the project
+```
 npm start
 ```
+  Navigate to `http://localhost:3000`
+
+```
+
+
