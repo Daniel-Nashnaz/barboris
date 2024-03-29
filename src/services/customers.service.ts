@@ -21,9 +21,13 @@ export const createCustomer = async (customerData: CustomerDto) => {
 };
 
 export const updateCustomer = async (customerId: number, customerData: CustomerDto) => {
+  const updatedCustomerData = {
+    ...customerData,
+    updated_at: new Date() 
+  };
   return prisma.customers.update({
     where: { id: customerId },
-    data: customerData,
+    data: updatedCustomerData,
   });
 };
 
