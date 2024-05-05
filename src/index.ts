@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import dotenv from "dotenv";
 import { customersRoute } from "./routes/customers.route"
+import { barberRoute } from './routes/barber.route';
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
@@ -8,6 +9,7 @@ dotenv.config();
 
 app.use(express.json());
 app.use(customersRoute)
+app.use(barberRoute)
 // Add this error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
