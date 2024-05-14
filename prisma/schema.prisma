@@ -9,19 +9,18 @@ datasource db {
 }
 
 model appointments {
-  id                     Int             @id @default(autoincrement())
-  appointment_time_start DateTime        @db.Timestamp(6)
-  appointment_time_end   DateTime        @db.Timestamp(6)
+  id                     Int          @id @default(autoincrement())
+  appointment_time_start DateTime     @db.Timestamp(6)
+  appointment_time_end   DateTime     @db.Timestamp(6)
   customer_id            Int?
   barber_id              Int?
   shop_id                Int?
-  status                 String?         @default("scheduled") @db.VarChar(20)
-  created_at             DateTime?       @default(now()) @db.Timestamp(6)
-  updated_at             DateTime?       @db.Timestamp(6)
-  barbers                barbers?        @relation(fields: [barber_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  customers              customers?      @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  barbershops            barbershops?    @relation(fields: [shop_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  typesHaircuts          typesHaircuts[]
+  created_at             DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at             DateTime?    @db.Timestamp(6)
+  typesHaircuts          Int          @default(1) @db.SmallInt
+  barbers                barbers?     @relation(fields: [barber_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  customers              customers?   @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  barbershops            barbershops? @relation(fields: [shop_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([appointment_time_start, shop_id])
 }
@@ -57,13 +56,4 @@ model customers {
   created_at   DateTime?      @default(now()) @db.Timestamp(6)
   updated_at   DateTime?      @db.Timestamp(6)
   appointments appointments[]
-}
-
-model typesHaircuts {
-  id             Int           @id @default(autoincrement())
-  appointment_id Int
-  type_haircut   Int?          @db.SmallInt
-  created_at     DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime      @db.Timestamptz(6)
-  appointments   appointments? @relation(fields: [appointment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
