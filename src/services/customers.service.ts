@@ -10,7 +10,7 @@ export const getAllCustomers = async () => {
 };
 
 export const getCustomerById = async (customerId: number) => {
- try {
+  try {
     const user = await prisma.customers.findUnique({
       where: { id: customerId },
     });
@@ -23,6 +23,20 @@ export const getCustomerById = async (customerId: number) => {
   }
 };
 
+export const findCustomerByEmail = async (email: string) => {
+  try {
+    const customer = await prisma.customers.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    return customer;
+  } catch (error) {
+    throw new Error(`Error finding customer by email: ${error}`);
+  }
+};
+
+
 export const createCustomer = async (customerData: CustomerDto) => {
   return prisma.customers.create({
     data: customerData,
@@ -30,25 +44,12 @@ export const createCustomer = async (customerData: CustomerDto) => {
 };
 
 export const updateCustomer = async (customerId: number, customerData: CustomerDto) => {
- /* const updatedCustomerData = {
-    ...customerData,
-    updated_at: new Date()
-  };
-  return prisma.customers.update({
-    where: { id: customerId },
-    data: updatedCustomerData,
-  });
-*/
-
   try {
     const existingCustomer = await prisma.customers.findUnique({
       where: { id: customerId },
     });
 
     if (!existingCustomer) {
-      // Handle the case where the customer is not found in the database
-      // For example, you could choose to create a new customer entry
-      // Or log a message and return null
       throw new Error(`Customer with ID ${customerId} not found`);
     }
 
@@ -76,10 +77,6 @@ export const deleteCustomer = async (customerId: number) => {
     console.log(deletedCustomer);
 
     if (isNullOrUndefined(deletedCustomer)) {
-      // Handle the case where the customer is not found in the database
-      // For example, you could choose to create a new customer entry
-      // Or log a message and return null
-      console.log("asasas");
       throw new Error(`Customer with ID ${customerId} not found`);
     }
     return deletedCustomer;
