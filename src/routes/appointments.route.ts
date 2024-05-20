@@ -7,7 +7,6 @@ import {
   deleteAppointment,
   getAppointmentsForDate,
 } from '../services/appointments.service';
-import moment from "moment";
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
@@ -57,29 +56,22 @@ appointmentRoute.post('/appointments', async (req: Request, res: Response) => {
   }
 });
 
-const appointme = [
+const appointme : Appointmen[] = [
   {
-    id: 6,
-    appointment_time_start: "2024-05-14T16:00:00.000Z",
-    appointment_time_end: "2024-05-14T16:30:00.000Z",
-    customer_id: 2,
-    barber_id: 1,
-    shop_id: 1,
-    created_at: "2024-05-14T17:20:08.433Z",
-    updated_at: null,
-    typesHaircuts: 2
-  }, {
-    id: 6,
-    appointment_time_start: "2024-05-15T17:00:00.000Z",
-    appointment_time_end: "2024-05-14T17:30:00.000Z",
-    customer_id: 2,
-    barber_id: 1,
-    shop_id: 1,
-    created_at: "2024-05-19T17:20:08.433Z",
-    updated_at: null,
-    typesHaircuts: 2
-  },
-  // פגישות נוספות כאן...
+    appointment_time_start: "2024-05-14T18:00:00.000Z",
+    appointment_time_end: "2024-05-14T18:30:00.000Z"
+
+  }
+  ,
+  {
+    appointment_time_start: "2024-05-15T12:00:00.000Z",
+    appointment_time_end: "2024-05-14T12:30:00.000Z",
+  }
+  ,
+  {
+    appointment_time_start: "2024-05-15T15:00:00.000Z",
+    appointment_time_end: "2024-05-14T15:30:00.000Z",
+  }
 ];
 
 
@@ -146,7 +138,10 @@ async function getAppointmentsOnDateTime(dateTime:any) {
     }
 }
 */
-
+interface Appointmen {
+  appointment_time_start: string;
+  appointment_time_end: string;
+}
 interface Appointment {
   appointment_time_start: Date;
   appointment_time_end: Date;
@@ -179,33 +174,35 @@ const generateTimeSlots = async (startTime: string, endTime: string, appointment
   return timeSlots;
 }
 */
-const generateTimeSlots = async (startTime: string, endTime: string, appointments: Appointment[]): Promise<string[]> => {
-  const timeSlots = [];
-  let currentTime = new Date(startTime);
-  const endDate = new Date(endTime);
 
-  // Sort appointments by start time
-  appointments.sort((a, b) => new Date(a.appointment_time_start).getTime() - new Date(b.appointment_time_start).getTime());
 
-  for (const appointment of appointments) {
-    const appointmentEnd = new Date(appointment.appointment_time_end);
-    // Move to the next available time slot after the appointment
-    currentTime = new Date(appointmentEnd.getTime() + 30 * 60 * 1000);
-  }
+const generateTimeSlots = async (startTime: Date, endTime: Date, appointments: Appointmen[]): Promise<string[]> => {
+  const timeSlots: string[] = [];
+  const timeIncrement: number = 30; 
+  let currentTime: Date = new Date(startTime);
+  const endDateTime: Date = new Date(endTime);
 
-  // Generate available time slots
-  while (currentTime < endDate) {
-    const hours = currentTime.getHours().toString().padStart(2, '0');
-    const minutes = currentTime.getMinutes().toString().padStart(2, '0');
-    const timeString = `${hours}:${minutes}`;
-    timeSlots.push(timeString);
+  const getHourAndMinute = (date: Date): string => {
+      const isoString: string = date.toISOString();
+      return isoString.slice(11, 16); 
+  };
 
-    // Move to the next time slot (30 minutes later)
-    currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
+  const appointmentStartTimes: Set<string> = new Set(appointments.map(appointment => getHourAndMinute(new Date(appointment.appointment_time_start))));
+
+  while (currentTime <= endDateTime) {
+      const timeString: string = getHourAndMinute(currentTime);
+
+      if (!appointmentStartTimes.has(timeString)) {
+          timeSlots.push(timeString);
+      }
+
+      currentTime = new Date(currentTime.getTime() + timeIncrement * 60 * 1000); 
   }
 
   return timeSlots;
-}
+};
+
+
 
 const getAppointmentsOnDateTime = async (dateTime: string): Promise<Appointment[]> => {
 
@@ -240,13 +237,9 @@ const getAppointmentsOnDateTime = async (dateTime: string): Promise<Appointment[
     throw error;
   }
 }
-
-
-
-
 appointmentRoute.get('/availableSlots/:date', async (req: Request, res: Response) => {
   try {
-     const { date } = req.params;
+    const { date } = req.params;
     //const appointments = await getAppointmentsOnDateTime(date);
 
     //const availableSlots = getAvailableSlots(date);
@@ -255,9 +248,9 @@ appointmentRoute.get('/availableSlots/:date', async (req: Request, res: Response
     // Example usage:
     const startTime = "2024-05-20T08:00:00Z"; // Example start time
     const endTime = "2024-05-20T17:00:00Z"; // Example end time
-    const appointments = await getAppointmentsOnDateTime(date); // Fetch appointments for the day
-    const timeSlots = await generateTimeSlots(startTime, endTime, appointments);
-    console.log(appointments);
+    //const appointments = await getAppointmentsOnDateTime(date); // Fetch appointments for the day
+   // console.log(appointme);
+    const timeSlots = await generateTimeSlots(new Date(startTime), new Date(endTime), appointme);
     res.json(timeSlots);
 
   } catch (error) {
