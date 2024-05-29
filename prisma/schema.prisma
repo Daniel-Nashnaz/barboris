@@ -37,15 +37,16 @@ model barbers {
 }
 
 model barbershops {
-  id           Int            @id @default(autoincrement())
-  name         String         @db.VarChar(100)
-  address      String         @unique @db.VarChar(255)
-  city         String         @db.VarChar(50)
-  phone_number String?        @db.VarChar(20)
-  created_at   DateTime?      @default(now()) @db.Timestamp(6)
-  updated_at   DateTime?      @db.Timestamp(6)
-  appointments appointments[]
-  barbers      barbers[]
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(100)
+  address       String         @unique @db.VarChar(255)
+  city          String         @db.VarChar(50)
+  phone_number  String?        @db.VarChar(20)
+  created_at    DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?      @db.Timestamp(6)
+  opening_hours Json
+  appointments  appointments[]
+  barbers       barbers[]
 }
 
 model customers {
