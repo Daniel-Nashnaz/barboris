@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from 'express';
 import { setCustomerAndAppointment } from '../services/actions.service';
-import { AppointmentDataClient } from '../model/appointmentDateClient.dto';
+import { AppointmentDataClient } from '../models/appointmentDateClient.dto';
 
 const ActionsRoute = Router();
 

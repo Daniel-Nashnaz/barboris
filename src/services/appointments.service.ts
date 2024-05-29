@@ -1,6 +1,6 @@
 import { PrismaClient, appointments } from '@prisma/client';
-import { AppointmentDetails } from '../model/AppointmentDetails.dto';
-import { AppointmentDto } from '../model/appointment.dto';
+import { AppointmentDetails } from '../models/AppointmentDetails.dto';
+import { AppointmentDto } from '../models/appointment.dto';
 
 const prisma = new PrismaClient();
 const startTime:Date = new Date("2024-05-20T08:00:00Z");
@@ -62,7 +62,7 @@ export const getAppointmentById = async (id: number): Promise<appointments | nul
     }
 };
 
-export const getAppointmentsAvailable = async(dateTime: string) => {
+export const getAppointmentsAvailable = async(dateTime: string): Promise<string[]> => {
     const appointments: AppointmentDetails[] = await getAppointmentsForDate(dateTime);
     const timeSlots: string[] = await generateTimeSlots(startTime,endTime, appointments);
     return timeSlots;

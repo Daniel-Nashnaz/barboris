@@ -1,6 +1,6 @@
 // customers.service.ts
 import { PrismaClient } from '@prisma/client';
-import { CustomerDto } from '../model/customers.dto';
+import { CustomerDto } from '../models/customers.dto';
 import { isNullOrUndefined } from 'util';
 
 const prisma = new PrismaClient();

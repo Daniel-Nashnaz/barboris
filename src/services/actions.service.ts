@@ -5,7 +5,7 @@ import {
 import {
     createAppointment
 } from '../services/appointments.service';
-import { AppointmentDataClient } from '../model/appointmentDateClient.dto';
+import { AppointmentDataClient } from '../models/appointmentDateClient.dto';
 const BARBER_ID: number = 3;
 const SHOP_ID: number = 1;
 export const setCustomerAndAppointment = async (appointmentData: AppointmentDataClient) => {

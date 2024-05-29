@@ -7,7 +7,7 @@ import {
   updateCustomer,
   deleteCustomer,
 } from '../services/customers.service';
-import { CustomerDto } from '../model/customers.dto';
+import { CustomerDto } from '../models/customers.dto';
 
 const customersRoute = Router()
 const prisma = new PrismaClient();

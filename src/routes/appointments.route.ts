@@ -8,9 +8,6 @@ import {
   getAppointmentsAvailable,
   getAppointmentsForDate,
 } from '../services/appointments.service';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
-
 const appointmentRoute = Router();
 
 // Appointments Routes
@@ -79,7 +76,7 @@ appointmentRoute.post('/appointments', async (req: Request, res: Response) => {
 appointmentRoute.get('/availableSlots/:date', async (req: Request, res: Response) => {
   try {
     const { date } = req.params;
-    const appointmentsAvailable = await getAppointmentsAvailable(date);
+    const appointmentsAvailable: string[] = await getAppointmentsAvailable(date);
     res.json(appointmentsAvailable);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });

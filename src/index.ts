@@ -5,14 +5,15 @@ import { customersRoute } from "./routes/customers.route"
 import { barberRoute } from './routes/barber.route';
 import appointmentRoute from './routes/appointments.route';
 import ActionsRoute from './routes/actions.route';
+import { barbershopRoute } from './routes/barbershop.route';
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
 dotenv.config();
-
 app.use(express.json());
+app.use(barbershopRoute);
 app.use(customersRoute)
 app.use(barberRoute)
 app.use(appointmentRoute)

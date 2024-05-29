@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { BarberDto } from '../model/barbers.dto';
+import { BarberDto } from '../models/barbers.dto';
 
 
 const prisma = new PrismaClient();
