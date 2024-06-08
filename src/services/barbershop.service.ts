@@ -1,38 +1,66 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, barbershops } from '@prisma/client';
+import { BarbershopDetails } from '../models/BarbershopDetails.dto';
+import { DaysOfWeek } from '../models/daysOfWeek.enum';
 const prisma = new PrismaClient();
 
 
-export const getOpeningHoursForDay = async (id: number, day: string) => {
+export const getOpeningHoursForDay = async (id: number, day: DaysOfWeek): Promise<any> => {
     try {
-        // Use select method to retrieve only the opening_hours column
-        const barbershop = await prisma.barbershops.findUnique({
-            where: { id: id }
-        });
+        const barbershop = await getBarbershopById(id);
 
         if (!barbershop) {
             throw new Error(`Barbershop with ID ${id} not found`);
         }
-        // Ensure opening_hours is not null
         const openingHours = barbershop.opening_hours as Prisma.JsonObject;
 
         // Extract the opening time for the given day of the week
-        const openingTime = openingHours[day];
-        console.log(openingTime);
-        if (!openingTime) {
-            return "Closed on this day";
-        }//if (openingHours?.opening_hours) //{
-        //  const { opening, closing } = openingHours[day];
-        //return `${opening} - ${closing}`;
-        // }
-
-        // If there are no opening hours for the given day, return null
-        // return null;
-        return openingTime;
+        return openingHours[day] || "Closed on this day";
     } catch (error) {
         console.error('Error fetching barbershop opening hours by ID:', error);
         throw error;
     }
-    // Check if the opening hours for the given day exist
 };
 
-// E
+export const getAllBarbershops = async (): Promise<BarbershopDetails[]> => {
+    const barbershops = await prisma.barbershops.findMany();
+    return barbershops.map(mapBarbershopDetails);
+};
+
+export const getBarbershopById = async (id: number): Promise<BarbershopDetails | null> => {
+    return await prisma.barbershops.findUnique({
+        where: { id },
+    });
+};
+
+export const createBarbershop = async (data: BarbershopDetails): Promise<barbershops> => {
+    return await prisma.barbershops.create({
+        data,
+    });
+};
+
+export const updateBarbershop = async (id: number, data: BarbershopDetails): Promise<BarbershopDetails> => {
+    const barbershop = await prisma.barbershops.update({
+        where: { id },
+        data,
+    });
+    return mapBarbershopDetails(barbershop);
+};
+
+export const deleteBarbershop = async (id: number): Promise<BarbershopDetails> => {
+    const barbershop = await prisma.barbershops.delete({
+        where: { id },
+    });
+    return mapBarbershopDetails(barbershop);
+};
+
+const mapBarbershopDetails = (barbershops: barbershops): BarbershopDetails => {
+    return {
+        name: barbershops.name,
+        address: barbershops.address,
+        city: barbershops.city,
+        phone_number: barbershops.phone_number,
+        opening_hours: barbershops.opening_hours,
+        manager_id: barbershops.manager_id
+    }
+
+};

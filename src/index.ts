@@ -8,6 +8,7 @@ import ActionsRoute from './routes/actions.route';
 import { barbershopRoute } from './routes/barbershop.route';
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
+const IP = process.env.IP || "localhost"
 
 app.use(cors());
 
@@ -28,5 +29,5 @@ app.use((req, res, next) => {
   next();
 });
 app.listen(PORT, () => {
-  console.log(`[server]: Server is running at http://localhost:${PORT}`);
+  console.log(`[server]: Server is running at http://${IP}:${PORT}`);
 });

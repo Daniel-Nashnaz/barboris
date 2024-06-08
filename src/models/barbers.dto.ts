@@ -1,5 +1,7 @@
 export interface BarberDto {
+    id: number
     name: string;
     email: string;
-    shop_id: number | null
+    phone_number: string | null;
+    shop_id: number | null;
 }

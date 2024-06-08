@@ -7,6 +7,7 @@ const ActionsRoute = Router();
 ActionsRoute.post('/addAppointment', async (req: Request, res: Response) => {
     const appointmentData: AppointmentDataClient = req.body;
     try {
+        console.log(appointmentData);
         const newAppointment = await setCustomerAndAppointment(appointmentData);
         res.json(newAppointment);
     } catch (error) {
