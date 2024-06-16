@@ -1,12 +1,10 @@
-import { Prisma, PrismaClient, appointments, barbershops } from '@prisma/client';
+import { PrismaClient, appointments, } from '@prisma/client';
 import { AppointmentDetails } from '../models/AppointmentDetails.dto';
 import { AppointmentDto } from '../models/appointment.dto';
 import { DateTime } from 'luxon';
 import { DaysOfWeek } from '../models/daysOfWeek.enum';
 
 const prisma = new PrismaClient();
-//const startTime: Date = new Date("2024-05-20T08:00:00Z");
-//const endTime: Date = new Date("2024-05-20T17:00:00Z");
 
 export const getAllAppointments = async (): Promise<appointments[]> => {
     try {
@@ -39,7 +37,7 @@ export const getAppointmentsForDateAndBarber = async (barberId: number, dateStri
             },
             select: {
                 appointment_time_start: true,
-                typesHaircuts: true,
+                haircut_type: true,
                 customers: { select: { name: true } },
                 barbers: { select: { name: true } },
                 barbershops: { select: { name: true } },
@@ -48,7 +46,7 @@ export const getAppointmentsForDateAndBarber = async (barberId: number, dateStri
 
         const formattedAppointments: AppointmentDetails[] = appointments.map((appointment) => ({
             appointment_time_start: getIsraelTime(appointment.appointment_time_start).toISO(),
-            typesHaircuts: appointment.typesHaircuts,
+            typesHaircuts: appointment.haircut_type,
             customer_name: appointment.customers?.name,
             barber_name: appointment.barbers?.name,
             shop_name: appointment.barbershops?.name,
@@ -102,7 +100,7 @@ export const getAppointmentsByBarberIdAndStartOrEndDate = async (barberId: numbe
             },
             select: {
                 appointment_time_start: true,
-                typesHaircuts: true,
+                haircut_type: true,
                 customers: { select: { name: true } },
                 barbers: { select: { name: true } },
                 barbershops: { select: { name: true } },
@@ -111,7 +109,7 @@ export const getAppointmentsByBarberIdAndStartOrEndDate = async (barberId: numbe
 
         const formattedAppointments: AppointmentDetails[] = appointments.map((appointment) => ({
             appointment_time_start: getIsraelTime(appointment.appointment_time_start).toISO(),
-            typesHaircuts: appointment.typesHaircuts,
+            typesHaircuts: appointment.haircut_type,
             customer_name: appointment.customers?.name,
             shop_name: appointment.barbershops?.name,
         }));
@@ -143,6 +141,7 @@ export const createAppointment = async (appointment: AppointmentDto): Promise<ap
         const newAppointment = await prisma.appointments.create({ data: appointment });
         return newAppointment;
     } catch (error) {
+        console.log(error);
         throw new Error(`Error creating appointment: ${error}`);
     }
 };
@@ -168,43 +167,6 @@ export const deleteAppointment = async (id: number): Promise<appointments | null
     }
 };
 
-/*
-const getAppointmentsOnDateTime = async (dateTime: string | Date): Promise<Appointment[]> => {
-
-    try {
-        const date = new Date(dateTime);
-        const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000); // Next day
-
-        const appointments = await prisma.appointments.findMany({
-            where: {
-                AND: [
-                    {
-                        appointment_time_start: {
-                            gte: startOfDay,
-                        },
-                    },
-                    {
-                        appointment_time_start: {
-                            lt: endOfDay,
-                        },
-                    },
-                ],
-            },
-            select: {
-                appointment_time_start: true,
-                appointment_time_end: true,
-            },
-        });
-        return appointments;
-    } catch (error) {
-        console.error("Error fetching appointments:", error);
-        throw error;
-    }
-};
-*/
-
-
 /**
  * Generates time slots for a given day based on the opening hours of a barbershop,
  * existing appointments, and a specified time increment.
@@ -214,7 +176,7 @@ const getAppointmentsOnDateTime = async (dateTime: string | Date): Promise<Appoi
  * @param {number} [timeIncrement=30] - The time interval (in minutes) between each time slot. Default is set to 30 minutes.
  * @returns {Promise<string[]>} - A promise that resolves to an array of available time slots.
  */
-export async function generateTimeSlotsOfDay(barbershopId: number, dateOfSolt: Date, appointments: AppointmentDetails[], timeIncrement: number = 30): Promise<string[]> {
+export const generateTimeSlotsOfDay = async (barbershopId: number, dateOfSolt: Date, appointments: AppointmentDetails[], timeIncrement: number = 30): Promise<string[]> {
     try {
         const nowTimeIsrael = DateTime.local().setZone('Asia/Jerusalem');
         const shop = await prisma.barbershops.findUnique({
@@ -256,7 +218,7 @@ export async function generateTimeSlotsOfDay(barbershopId: number, dateOfSolt: D
                     const timeString: string = currentTime.toFormat('HH:mm');
 
                     // Check if the current date matches the date of the time slot
-                    if (dateOfSolt.getDate() === nowTimeIsrael.toJSDate().getDate()) {
+                    if (areDatesEqual(nowTimeIsrael, getIsraelTime(dateOfSolt))) {
                         // Ignore time slots before the current time
                         if (nowTimeIsrael.hour > currentTime.hour || (nowTimeIsrael.hour === currentTime.hour && nowTimeIsrael.minute > currentTime.minute)) {
                             currentTime = currentTime.plus({ minutes: timeIncrement });
@@ -373,4 +335,9 @@ const getIsraelTime = (date: Date): DateTime => {
     const israelDt = dt.setZone('Asia/Jerusalem');
     return israelDt;
 };
+
+const areDatesEqual = (dt1: DateTime, dt2: DateTime): boolean => {
+    return dt1.hasSame(dt2, 'day');
+};
+
 
