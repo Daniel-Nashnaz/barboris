@@ -1,7 +1,7 @@
 // customers.service.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, customers } from '@prisma/client';
 import { CustomerDto } from '../models/customers.dto';
-import { isNullOrUndefined } from 'util';
+import { isNullOrUndefined } from '../models/validationHelpers';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +23,13 @@ export const getCustomerById = async (customerId: number) => {
   }
 };
 
-export const findCustomerByEmail = async (email: string) => {
+/**
+ * Finds a customer by their email address.
+ * @param email The email address of the customer to find.
+ * @returns A Promise that resolves with the found customer or null if not found.
+ * @throws Error if an error occurs while finding the customer.
+ */
+export const findCustomerByEmail = async (email: string): Promise<customers | null> => {
   try {
     const customer = await prisma.customers.findUnique({
       where: {
@@ -35,7 +41,6 @@ export const findCustomerByEmail = async (email: string) => {
     throw new Error(`Error finding customer by email: ${error}`);
   }
 };
-
 
 export const createCustomer = async (customerData: CustomerDto) => {
   return prisma.customers.create({
