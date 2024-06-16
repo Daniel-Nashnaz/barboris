@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 
 
 export interface BarbershopDetails {
+    id: number;
     name: string;
     address: string;
     city: string;

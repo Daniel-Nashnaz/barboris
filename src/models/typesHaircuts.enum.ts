@@ -1,6 +1,9 @@
-enum TypesHaircuts {
-    Haircut = 1,
-    HaircutBeard = 2,
-    HaircutBeardEyebrowsWax = 3,
-    HaircutColorOrpainting = 4,
+export enum HaircutType {
+    Haircut = "Haircut",
+    Beard = "Beard",
+    StreaksLightening = "StreaksLightening",
+    Color = "Color",
+    Eyebrows = "Eyebrows",
+    Wax = "Wax",
 }
+

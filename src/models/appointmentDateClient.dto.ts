@@ -1,8 +1,12 @@
+import { HaircutType } from "./typesHaircuts.enum";
+
 export interface AppointmentDataClient {
-    timeStart: Date;
-    timeEnd: Date;
-    haircutType: number;
-    name: string;
-    email: string;
-    phone: string;
-  }
+  barbershopId: number;
+  barberId: number;
+  timeStart: Date;
+  timeEnd: Date;
+  haircutType?: HaircutType[];
+  name: string;
+  email: string;
+  phone: string;
+}
