@@ -6,6 +6,7 @@ import { barberRoute } from './routes/barber.route';
 import appointmentRoute from './routes/appointments.route';
 import ActionsRoute from './routes/actions.route';
 import { barbershopRoute } from './routes/barbershop.route';
+import { barberBarbershops } from './routes/barberVSbarbershop.route';
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
 const IP = process.env.IP || "localhost"
@@ -14,11 +15,12 @@ app.use(cors());
 
 dotenv.config();
 app.use(express.json());
-app.use(barbershopRoute);
-app.use(customersRoute)
-app.use(barberRoute)
+app.use('/barbershop', barbershopRoute);
+app.use('/customer', customersRoute)
+app.use('/barber', barberRoute)
 app.use(appointmentRoute)
 app.use(ActionsRoute)
+app.use('/barberVsBarbershops', barberBarbershops)
 // Add this error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
