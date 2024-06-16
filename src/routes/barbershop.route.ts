@@ -1,9 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { createBarbershop, deleteBarbershop, getAllBarbershops, getBarbershopById, getOpeningHoursForDay, updateBarbershop } from '../services/barbershop.service';
+import { createBarbershop, deleteBarbershop, getAllBarbershops, getAllbarbershopOfBarberId, getBarbershopById, getOpeningHoursForDay, updateBarbershop } from '../services/barbershop.service';
 import { DaysOfWeek } from '../models/daysOfWeek.enum';
 const barbershopRoute = Router()
 
-// Get all barbershops
 barbershopRoute.get('/barbershops', async (req: Request, res: Response) => {
     try {
         const barbershops = await getAllBarbershops();
@@ -14,7 +13,6 @@ barbershopRoute.get('/barbershops', async (req: Request, res: Response) => {
     }
 });
 
-// Get a specific barbershop by ID
 barbershopRoute.get('/barbershop/:id', async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     try {
@@ -29,7 +27,18 @@ barbershopRoute.get('/barbershop/:id', async (req: Request, res: Response) => {
     }
 });
 
-// Create a new barbershop
+barbershopRoute.get('/getBarbershopOfBarberId/:id', async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const barbers = await getAllbarbershopOfBarberId(id);
+        res.json(barbers);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(error);
+    }
+
+});
+
 barbershopRoute.post('/barbershop', async (req: Request, res: Response) => {
     try {
         const barbershopData = req.body;
@@ -41,7 +50,6 @@ barbershopRoute.post('/barbershop', async (req: Request, res: Response) => {
     }
 });
 
-// Update an existing barbershop
 barbershopRoute.put('/barbershop/:id', async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     try {
@@ -57,7 +65,6 @@ barbershopRoute.put('/barbershop/:id', async (req: Request, res: Response) => {
     }
 });
 
-// Delete a barbershop by ID
 barbershopRoute.delete('/barbershop/:id', async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     try {
@@ -85,6 +92,7 @@ barbershopRoute.get('/barbershops/:id/opening-hours/:day', async (req: Request, 
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 
 export { barbershopRoute }
