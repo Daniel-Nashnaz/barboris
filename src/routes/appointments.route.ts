@@ -1,4 +1,4 @@
-import express, { Request, Response, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import {
   getAllAppointments,
   getAppointmentById,
@@ -6,13 +6,11 @@ import {
   updateAppointment,
   deleteAppointment,
   getAppointmentsAvailable,
-  getAppointmentsForDateAndBarber,
-  getAppointmentsByBarberIdAndStartOrEndDate,
-  generateTimeSlotsOfDay,
-  generateTimeSlotsOfDa,
+  getAllAppointmentsOfUser,
+  getAllAppointmentsOfBarber,
+  getAllAppointmentsOfBarbershop,
+  getAppointmentsByBarberIdAndBarbershopIdAndDateRange,
 } from '../services/appointments.service';
-import { AppointmentDetails } from '../models/AppointmentDetails.dto';
-import { HaircutType } from '../models/typesHaircuts.enum';
 const appointmentRoute = Router();
 
 
@@ -25,14 +23,20 @@ appointmentRoute.get('/appointments', async (req: Request, res: Response) => {
   }
 });
 
-appointmentRoute.get('/appointmentsByDateAndBarberId', async (req: Request, res: Response) => {
+appointmentRoute.get('/appointmentsByDateRangeAndBarberIdAndBarbershopId', async (req: Request, res: Response) => {
   try {
-    const date = req.query.date as string;
+    const startDate = req.query.startDate as string;
+    const endDate = req.query.endDate as string;
     const barberId = req.query.barberId as string;
-    if (!date || !barberId) {
-      return res.status(400).json({ error: 'Both date and barberId are required' });
+    const barbershopId = req.query.barbershopId as string;
+    console.log(startDate);
+    console.log(endDate);
+    console.log(barberId);
+    console.log(barbershopId);
+    if (!startDate || !endDate || !barberId || !barbershopId) {
+      return res.status(400).json({ error: 'startDate endtDate and barberId and barbershopId are required' });
     }
-    const appointments = await getAppointmentsForDateAndBarber(parseInt(barberId, 10), date);
+    const appointments = await getAppointmentsByBarberIdAndBarbershopIdAndDateRange(parseInt(barberId, 10), parseInt(barbershopId, 10), new Date(startDate), new Date(endDate));
     res.json(appointments);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
@@ -41,12 +45,37 @@ appointmentRoute.get('/appointmentsByDateAndBarberId', async (req: Request, res:
 
 appointmentRoute.get('/appointmentsByBarberId', async (req: Request, res: Response) => {
   try {
-    const date = req.query.date as string;
     const barberId = req.query.barberId as string;
     if (!barberId) {
-      return res.status(400).json({ error: 'Both date and barberId are required' });
+      return res.status(400).json({ error: 'BarberId are required' });
     }
-    const appointments = await getAppointmentsByBarberIdAndStartOrEndDate(parseInt(barberId, 10), new Date("2024-08-01 09:00:00"));
+    const appointments = await getAllAppointmentsOfBarber(parseInt(barberId, 10));
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+appointmentRoute.get('/appointmentsByBarbershopId', async (req: Request, res: Response) => {
+  try {
+    const barbershopId = req.query.barbershopId as string;
+    if (!barbershopId) {
+      return res.status(400).json({ error: 'BarbershopId are required' });
+    }
+    const appointments = await getAllAppointmentsOfBarbershop(parseInt(barbershopId, 10));
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+appointmentRoute.get('/appointmentsByUserId', async (req: Request, res: Response) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      return res.status(400).json({ error: 'UserId are required' });
+    }
+    const appointments = await getAllAppointmentsOfUser(parseInt(userId, 10));
     res.json(appointments);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
@@ -80,85 +109,47 @@ appointmentRoute.post('/appointment', async (req: Request, res: Response) => {
 appointmentRoute.put('/appointment/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   try {
-      const appointmentData = req.body;
-      const updatedAppointment = await updateAppointment(id, appointmentData);
-      if (!updatedAppointment) {
-          return res.status(404).json({ message: `Appointment with ID ${id} not found` });
-      }
-      return res.status(200).json(updatedAppointment);
+    const appointmentData = req.body;
+    const updatedAppointment = await updateAppointment(id, appointmentData);
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: `Appointment with ID ${id} not found` });
+    }
+    return res.status(200).json(updatedAppointment);
   } catch (error: unknown) {
-      console.error('Error updating appointment:', error);
-      return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error updating appointment:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 appointmentRoute.delete('/appointment/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   try {
-      const deletedAppointment = await deleteAppointment(id);
-      if (!deletedAppointment) {
-          return res.status(404).json({ message: `Appointment with ID ${id} not found` });
-      }
-      return res.status(200).json(deletedAppointment);
+    const deletedAppointment = await deleteAppointment(id);
+    if (!deletedAppointment) {
+      return res.status(404).json({ message: `Appointment with ID ${id} not found` });
+    }
+    return res.status(200).json(deletedAppointment);
   } catch (error: unknown) {
-      console.error('Error deleting Appointment:', error);
-      return res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error deleting Appointment:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-appointmentRoute.get('/availableSlots/:date', async (req: Request, res: Response) => {
+appointmentRoute.get('/availableSlots', async (req: Request, res: Response) => {
   try {
-    const { date } = req.params;
-    console.log(date);
-    const appointmentsAvailable: string[] = await getAppointmentsAvailable(1, 3, new Date(date));
+    const date = req.query.date as string;
+    const barberId = req.query.barberId as string;
+    const barbershopId = req.query.barbershopId as string;
+
+    if (!date || !barberId || !barbershopId) {
+      return res.status(400).json({ error: 'Both date and barberId and barbershopId are required' });
+    }
+    const appointmentsAvailable: string[] = await getAppointmentsAvailable(Number(barberId), Number(barbershopId), new Date(date));
     res.json(appointmentsAvailable);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
 });
-
-const appointments: AppointmentDetails[] = [
-  {
-    appointment_time_start: new Date('2024-06-09T10:00:00'),
-    haircut_type: [HaircutType.Beard],
-    customer_name: 'John Doe',
-    barber_name: 'Barber A',
-    shop_name: 'Shop X'
-  },
-  {
-    appointment_time_start: new Date('2024-06-09T11:30:00'),
-    haircut_type: [HaircutType.Beard],
-    customer_name: 'Jane Smith',
-    barber_name: 'Barber B',
-    shop_name: 'Shop Y'
-  },
-  {
-    appointment_time_start: new Date('2024-06-09T20:30:00'),
-    haircut_type: [HaircutType.Beard],
-    customer_name: 'Alice Johnson',
-    barber_name: 'Barber C',
-    shop_name: 'Shop Z'
-  }
-];
-
-appointmentRoute.get('/e', async (req: Request, res: Response) => {
-  try {
-    const ress = await generateTimeSlotsOfDay(3, new Date(), appointments);
-
-    res.json(ress);
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-  }
-});
-appointmentRoute.get('/test', async (req: Request, res: Response) => {
-  try {
-    const appointments = await getAppointmentsByBarberIdAndStartOrEndDate(1, new Date("2022-01-01 09:00:00"),new Date("2024-10-01 12:00:00"));
-    res.json(appointments);
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-  }
-});
-
 
 
 export default appointmentRoute;
