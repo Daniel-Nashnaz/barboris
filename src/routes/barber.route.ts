@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { createBarber, findBarberByEmail, getAllbarber, getAllbarberInBarbershopId, getAllbarbers, } from '../services/barber.service';
+import { createBarber, findBarberByEmail, getAllbarberInBarbershopId, getAllbarbers, } from '../services/barber.service';
 const barberRoute = Router()
 
 barberRoute.get('/barbers', async (req: Request, res: Response) => {
@@ -35,7 +35,6 @@ barberRoute.get('/getBarbersOfBarbershopId/:id', async (req: Request, res: Respo
     }
 
 });
-
 
 barberRoute.post('/barber', async (req: Request, res: Response) => {
     try {

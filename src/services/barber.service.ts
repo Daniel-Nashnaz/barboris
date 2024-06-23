@@ -1,7 +1,5 @@
 import { PrismaClient, barbers } from '@prisma/client';
 import { BarberDto } from '../models/barbers.dto';
-import { BarbershopDetails } from '../models/BarbershopDetails.dto';
-
 
 const prisma = new PrismaClient();
 
@@ -71,8 +69,6 @@ export const findBarberByEmail = async (email: string): Promise<barbers | null> 
   }
 };
 
-
-
 export const getAllbarberInBarbershopId = async (barbershopId: number): Promise<BarberDto[]> => {
   try {
     const barbers = await prisma.barbers.findMany({
@@ -96,8 +92,24 @@ export const getAllbarberInBarbershopId = async (barbershopId: number): Promise<
   }
 };
 
+export const getBarbershopManagerOfbarberId = async (barberId: number): Promise<number[]> => {
+  try {
+    const barbershops = await prisma.barbershops.findMany({
+      where: {
+        manager_id: barberId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const barbershopIds = barbershops.map(barbershop => barbershop.id);
+    return barbershopIds;
+  } catch (error) {
+    throw new Error(`Error fetching barbers: ${error}`);
+  }
+};
 
-export const getBarbershopOfbarberId = async (barberId: number): Promise<number[]> => {
+export const getBarbershopThatBarberWorkById = async (barberId: number): Promise<number[]> => {
   try {
     const barbershops = await prisma.barbershops.findMany({
       where: {
