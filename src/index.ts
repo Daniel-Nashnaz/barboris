@@ -11,8 +11,10 @@ const app: Express = express();
 const PORT = process.env.PORT || 3000;
 const IP = process.env.IP || "localhost"
 
+// push to git....
+//app.use(cors());
 const corsOptions = {
-  origin: 'http://127.0.0.1:5501', // או אתר הדפדפן שלך
+  origin: ['http://127.0.0.1:5501','https://daniel-nassi.github.io'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
