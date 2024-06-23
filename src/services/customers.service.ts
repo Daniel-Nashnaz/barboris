@@ -1,4 +1,3 @@
-// customers.service.ts
 import { PrismaClient, customers } from '@prisma/client';
 import { CustomerDto } from '../models/customers.dto';
 import { isNullOrUndefined } from '../models/validationHelpers';
