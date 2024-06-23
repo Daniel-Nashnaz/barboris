@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx prisma generate",
+    "build": "npx tsc",
     "start": "nodemon src/index.ts",
-    "dev": " start: ts-node-dev --inspect --transpile-only --ignore-watch node_modules --poll --respawn --exit-child src/index.ts"
+    "dev": " start: ts-node-dev --inspect --transpile-only --ignore-watch node_modules --poll --respawn --exit-child src/index.ts",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
