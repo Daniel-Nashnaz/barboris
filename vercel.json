@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
       {
-        "src": "prisma generate && src/index.ts && npx tsc",
+        "src": "npx prisma generate && src/index.ts && npx tsc",
         "use": "@vercel/node"
       }
     ],
