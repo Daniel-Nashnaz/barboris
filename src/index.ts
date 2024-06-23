@@ -21,6 +21,10 @@ app.use('/barber', barberRoute)
 app.use(appointmentRoute)
 app.use(ActionsRoute)
 app.use('/barberVsBarbershops', barberBarbershops)
+
+app.get('/', (req: Request, res: Response) => {
+  res.send('Welcome to my barboris server!');
+});
 // Add this error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
@@ -28,6 +32,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 app.listen(PORT, () => {
