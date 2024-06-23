@@ -15,7 +15,7 @@ ActionsRoute.post('/addAppointment', async (req: Request, res: Response) => {
     }
 });
 
-ActionsRoute.get('/getUserRole/:email', async (req: Request, res: Response) => {
+ActionsRoute.get('/getUserRoleData/:email', async (req: Request, res: Response) => {
     try {
         const email = String(req.params.email);
         console.log(email);

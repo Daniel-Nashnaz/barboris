@@ -5,7 +5,7 @@ import {
 import { createAppointment } from '../services/appointments.service';
 import { AppointmentDataClient } from '../models/appointmentDateClient.dto';
 import { User } from '../models/userDetails.dto';
-import { findBarberByEmail, getBarbershopOfbarberId } from './barber.service';
+import { findBarberByEmail, getBarbershopManagerOfbarberId } from './barber.service';
 import { UserIds, UserRole } from '../models/userRoles.enum';
 /**
  * Creates or updates a customer and creates a new appointment for the customer.
@@ -89,7 +89,7 @@ export const getUserRoleByEmail = async (email: string): Promise<User | null> =>
             }
 
             // Check if the barber is an admin of any barbershop
-            const barbershopAdmin = await getBarbershopOfbarberId(barberData.id);
+            const barbershopAdmin = await getBarbershopManagerOfbarberId(barberData.id);
             if (barbershopAdmin.length !== 0) {
                 userData.id[UserIds.BARBERSHOPS_ID] = barbershopAdmin;
                 userData.roles.push(UserRole.ADMIN);
